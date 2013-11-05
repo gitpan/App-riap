@@ -1,0 +1,91 @@
+
+use strict;
+use warnings;
+
+use 5.010001;
+
+use ExtUtils::MakeMaker 6.30;
+
+
+
+my %WriteMakefileArgs = (
+  "ABSTRACT" => "Implementation for the riap command-line shell",
+  "AUTHOR" => "Steven Haryanto <stevenharyanto\@gmail.com>",
+  "BUILD_REQUIRES" => {},
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
+  },
+  "DISTNAME" => "App-riap",
+  "EXE_FILES" => [
+    "bin/riap"
+  ],
+  "LICENSE" => "perl",
+  "NAME" => "App::riap",
+  "PREREQ_PM" => {
+    "Data::Clean::JSON" => "0.13",
+    "Data::Sah" => 0,
+    "JSON" => 0,
+    "Log::Any" => 0,
+    "Path::Naive" => "0.02",
+    "Perinci::Access" => "0.34",
+    "Perinci::CmdLine" => "0.94",
+    "Perinci::Result::Format" => 0,
+    "Perinci::Sub::Complete" => "0.34",
+    "Perinci::Sub::GetArgs::Argv" => "0.27",
+    "Perinci::Sub::Wrapper" => "0.46",
+    "Riap" => "v1.1.19",
+    "SHARYANTO::Complete::Util" => 0,
+    "Term::ReadLine::Perl" => 0,
+    "Term::Shell" => 0,
+    "URI" => 0
+  },
+  "TEST_REQUIRES" => {
+    "File::Spec" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
+    "Test::More" => 0
+  },
+  "VERSION" => "0.01",
+  "test" => {
+    "TESTS" => "t/*.t"
+  }
+);
+
+
+my %FallbackPrereqs = (
+  "Data::Clean::JSON" => "0.13",
+  "Data::Sah" => 0,
+  "File::Spec" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
+  "JSON" => 0,
+  "Log::Any" => 0,
+  "Path::Naive" => "0.02",
+  "Perinci::Access" => "0.34",
+  "Perinci::CmdLine" => "0.94",
+  "Perinci::Result::Format" => 0,
+  "Perinci::Sub::Complete" => "0.34",
+  "Perinci::Sub::GetArgs::Argv" => "0.27",
+  "Perinci::Sub::Wrapper" => "0.46",
+  "Riap" => "v1.1.19",
+  "SHARYANTO::Complete::Util" => 0,
+  "Term::ReadLine::Perl" => 0,
+  "Term::Shell" => 0,
+  "Test::More" => 0,
+  "URI" => 0
+);
+
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+  delete $WriteMakefileArgs{TEST_REQUIRES};
+  delete $WriteMakefileArgs{BUILD_REQUIRES};
+  $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+WriteMakefile(%WriteMakefileArgs);
+
+
+
