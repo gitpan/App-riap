@@ -9,11 +9,13 @@ use Log::Any '$log';
 
 use parent qw(Term::Shell);
 
+use Color::ANSI::Util qw(ansifg);
 use Data::Clean::JSON;
 use Path::Naive qw(concat_path_n);
-use Term::ANSIColor;
+use Perinci::Sub::Util qw(err);
+use Term::Detect::Software qw(detect_terminal_cached);
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
@@ -32,7 +34,7 @@ sub new {
             print <<'EOT';
 Usage:
   riap --help
-  riap [opts] [URI]
+  riap [opts] [server-uri]
 
 Options:
   --help        Show this help message
@@ -59,6 +61,10 @@ EOT
     $self->load_history;
     $self->load_settings;
 
+    # determine color support
+    $self->{use_color} //= $ENV{COLOR} //
+        detect_terminal_cached()->{color};
+
     # set some settings from cmdline args
     $self->{_pa} //= Perinci::Access->new;
     $self->setting(user     => $opts{user})     if defined $opts{user};
@@ -66,15 +72,80 @@ EOT
 
     # determine starting pwd
     my $pwd;
-    my $surl = URI->new($ARGV[0] // "pl:/");
-    $surl->scheme('pl') if !$surl->scheme;
+    my $surl = URI->new($ARGV[0] // "/");
+    $self->state(server_url => $surl);
     my $res = $self->{_pa}->parse_url($surl);
     die "Can't parse url $surl\n" unless $res;
-    $self->state(server_url => $surl);
-    $self->state(pwd        => $res->{path});
-    $self->state(start_pwd  => $res->{path});
+    $pwd = $res->{path};
+    $self->state(pwd        => $pwd);
+    $self->state(start_pwd  => $pwd);
+    $self->run_cd($pwd);
 
     $self;
+}
+
+# override, readline workarounds
+sub cmdloop {
+    require IO::Stty;
+    require Signal::Safety;
+
+    my $o = shift;
+    my $rl = $o->{term};
+
+    local $SIG{INT} = sub {
+        # save history when we are interrupted
+        $o->save_history;
+        print STDERR "Interrupted\n";
+        if ($rl->ReadLine eq 'Term::ReadLine::Gnu') {
+            IO::Stty::stty(\*STDIN, 'echo');
+        }
+        exit 1;
+    };
+
+    local $SIG{__DIE__} = sub {
+        IO::Stty::stty(\*STDIN, 'echo');
+        die @_;
+    };
+
+    # some workaround for Term::ReadLine
+    # say "D0, rl=", $rl->ReadLine;
+    my $attribs = $rl->Attribs;
+    if ($rl->ReadLine eq 'Term::ReadLine::Gnu') {
+        # TR::Gnu traps our INT handler
+        # ref: http://www.perlmonks.org/?node_id=1003497
+        $attribs->{catch_signals} = 0;
+    } elsif ($rl->ReadLine eq 'Term::ReadLine::Perl') {
+        # TR::Perl messes up colors
+        # doesn't do anything?
+        #$rl->ornaments(0);
+        #$attribs->{term_set} = ["", "", "", ""];
+    }
+
+    $o->{stop} = 0;
+    $o->preloop;
+    while (1) {
+        my $line;
+        {
+            no warnings 'once';
+            local $Signal::Safety = 0; # limit the use of unsafe signals
+            $line = $o->readline($o->prompt_str);
+        }
+        last unless defined($line);
+        $o->cmd($line);
+        last if $o->{stop};
+    }
+    $o->postloop;
+}
+
+sub mainloop { goto \&cmdloop }
+
+sub colorize {
+    my ($self, $text, $color) = @_;
+    if ($self->{use_color}) {
+        ansifg($color) . $text . "\e[0m";
+    } else {
+        $text;
+    }
 }
 
 sub _json_obj {
@@ -93,7 +164,9 @@ sub json_decode {
 
 sub json_encode {
     my ($self, $arg) = @_;
-    $self->_json_obj->encode($cleanser->clone_and_clean($arg));
+    my $data = $cleanser->clone_and_clean($arg);
+    #use Data::Dump; dd $data;
+    $self->_json_obj->encode($data);
 }
 
 sub settings_filename {
@@ -111,12 +184,12 @@ sub known_settings {
     if (!$settings) {
         require Perinci::Result::Format;
         $settings = {
-            debug_show_request => {
-                summary => 'Whether to display raw Riap requests being sent',
+            debug_riap => {
+                summary => 'Whether to display raw Riap requests/responses',
                 schema  => ['bool', default=>0],
             },
-            debug_show_response => {
-                summary => 'Whether to display raw Riap responses from server',
+            debug_completion => {
+                summary => 'Whether to display debugging for tab completion',
                 schema  => ['bool', default=>0],
             },
             output_format => {
@@ -252,24 +325,35 @@ sub prompt_str {
     my $self = shift;
     join(
         "",
-        colored("riap", "bright_blue"), " ",
-        colored($self->state("pwd"), "green"), " ",
+        $self->colorize("riap", "4169e1"), " ", # royal blue
+        $self->colorize($self->state("pwd"), "2e8b57"), " ", # seagreen
         "> ",
     );
 }
 
+our $_in_completion;
 sub riap_request {
-    my ($self, $action, $uri, $extra) = @_;
+    my ($self, $action, $uri, $extra0) = @_;
     my $copts = {
         user     => $self->setting('user'),
         password => $self->setting('password'),
     };
-    if ($self->setting("debug_show_request")) {
-        say "DEBUG: Riap request: ".
-            $self->json_encode({action=>$action, uri=>$uri, %{$extra // {}}});
+
+    my $surl = $self->state('server_url');
+
+    my $extra = { %{ $extra0 // {} } };
+    $extra->{uri} = $uri;
+
+    my $show = $_in_completion ?
+        $self->setting("debug_riap") && $self->setting("debug_completion") :
+            $self->setting("debug_riap");
+
+    if ($show) {
+        say "DEBUG: Riap request: $action => $surl ".
+            $self->json_encode($extra);
     }
-    my $res = $self->{_pa}->request($action, $uri, $extra, $copts);
-    if ($self->setting("debug_show_request")) {
+    my $res  = $self->{_pa}->request($action, $surl, $extra, $copts);
+    if ($show) {
         say "DEBUG: Riap response: ".$self->json_encode($res);
     }
     $res;
@@ -344,6 +428,8 @@ sub comp_ {
     my $self = shift;
     my ($cmd, $word0, $line, $start) = @_;
 
+    local $_in_completion = 1;
+
     my @res = ("help", "exit");
     push @res, keys %App::riap::Commands::SPEC;
 
@@ -365,7 +451,21 @@ sub comp_ {
     }
     #use Data::Dump; dd \@res;
 
-    @{ SHARYANTO::Complete::Util::complete_array(array=>\@res, word=>$word0) };
+    my @comp = $self->_mimic_shell_completion(@{
+        SHARYANTO::Complete::Util::complete_array(array=>\@res, word=>$word0)
+      });
+    if ($self->setting("debug_completion")) {
+        say "DEBUG: Completion: ".join(", ", @comp);
+    }
+    @comp;
+}
+
+sub _err {
+    require Perinci::Result::Format;
+
+    my $self = shift;
+
+    print Perinci::Result::Format::format($_[0], "text");
 }
 
 sub catch_run {
@@ -376,18 +476,23 @@ sub catch_run {
     my $uri = concat_path_n($pwd, $cmd);
     my $res = $self->riap_request(info => $uri);
     if ($res->[0] == 404) {
-        return [404, "No such command or executable"];
-    } elsif ($res->[0] != 200) {
-        return $res;
-    }
-    do {
-        say "ERROR: Not an executable (Riap function)";
+        $self->_err([404, "No such command or executable (Riap function)"]);
         return;
-    } unless $res->[2]{type} eq 'function';
+    } elsif ($res->[0] != 200) {
+        $self->_err($res);
+        return;
+    }
+    unless ($res->[2]{type} eq 'function') {
+        $self->_err([412, "Not an executable (Riap function)"]);
+        return;
+    }
     my $name = $res->[2]{uri}; $name =~ s!.+/!!;
 
     $res = $self->riap_request(meta => $uri);
-    return $res unless $res->[0] == 200;
+    if ($res->[0] != 200) {
+        $self->_err(err(500, "Can't get meta", $res));
+        return;
+    }
     my $meta = $res->[2];
 
     $self->_run_cmd(
@@ -400,11 +505,25 @@ sub catch_run {
     );
 }
 
+# trick to mimic shell's behavior (taken from periscomp code): if a single
+# dir foo/ matches, don't let completion complete and add spaces, so user
+# can Tab several times to drill down path, which is convenient.
+sub _mimic_shell_completion {
+    my ($self, @comp) = @_;
+
+    if (@comp == 1 && $comp[0] =~ m!/\z!) {
+        push @comp, "$comp[0] ";
+    }
+    @comp;
+}
+
 sub catch_comp {
     require Perinci::Sub::Complete;
 
     my $self = shift;
     my ($cmd, $word, $line, $start) = @_;
+
+    local $_in_completion = 1;
 
     my $pwd = $self->state("pwd");
     my $uri = concat_path_n($pwd, $cmd);
@@ -423,7 +542,8 @@ sub catch_comp {
         common_opts => [qw/--help -h -? --verbose -v/],
         extra_completer_args => {-shell => $self},
     );
-    @$res;
+
+    $self->_mimic_shell_completion(@$res);
 }
 
 my $installed = 0;
@@ -462,6 +582,7 @@ sub _install_cmds {
 
             my $self = shift;
             my ($word, $line, $start) = @_;
+            local $_in_completion = 1;
             local $ENV{COMP_LINE} = $line;
             local $ENV{COMP_POINT} = $start + length($word);
             my $res = Perinci::Sub::Complete::shell_complete_arg(
@@ -469,7 +590,11 @@ sub _install_cmds {
                 common_opts => [qw/--help -h -? --verbose -v/],
                 extra_completer_args => {-shell => $self},
             );
-            @$res;
+            my @comp = $self->_mimic_shell_completion(@$res);
+            if ($self->setting('debug_completion')) {
+                say "DEBUG: Completion: ".join(", ", @comp);
+            }
+            @comp;
         };
         if (@{ $meta->{"x.app.riap.aliases"} // []}) {
             # XXX not yet installed by Term::Shell?
@@ -495,7 +620,7 @@ App::riap - Implementation for the riap command-line shell
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

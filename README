@@ -2,7 +2,7 @@ NAME
     App::riap - Implementation for the riap command-line shell
 
 VERSION
-    version 0.01
+    version 0.02
 
 SYNOPSIS
     Use the provided riap script.
