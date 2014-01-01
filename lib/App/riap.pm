@@ -15,11 +15,12 @@ use Path::Naive qw(concat_path_n);
 use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
 sub new {
+    require CHI;
     require Getopt::Long;
     require Perinci::Access;
     require URI;
@@ -37,9 +38,9 @@ Usage:
   riap [opts] [server-uri]
 
 Options:
-  --help        Show this help message
-  --user=S      Supply HTTP authentication user
-  --password=S  Supply HTTP authentication password
+  --help            Show this help message
+  --user=S, -u      Supply HTTP authentication user
+  --password=S, -p  Supply HTTP authentication password
 
 Examples:
   % riap
@@ -49,8 +50,8 @@ For more help, see the manpage.
 EOT
                 exit 0;
         },
-        "user=s"     => \$opts{user},
-        "password=s" => \$opts{password},
+        "user|u=s"     => \$opts{user},
+        "password|p=s" => \$opts{password},
     );
     my $old_go_opts = Getopt::Long::Configure();
     Getopt::Long::GetOptions(@gospec);
@@ -59,13 +60,23 @@ EOT
     $class->_install_cmds;
     my $self = $class->SUPER::new();
     $self->load_history;
+
+    # load from file
     $self->load_settings;
+
+    # override some settings from env, if available
+    # ...
+
+    $self->{_in_completion} = 0;
+
+    # for now we don't impose cache size limit
+    $self->{_cache} = CHI->new(driver=>'Memory', global=>1);
 
     # determine color support
     $self->{use_color} //= $ENV{COLOR} //
         detect_terminal_cached()->{color};
 
-    # set some settings from cmdline args
+    # override some settings from cmdline args, if defined
     $self->{_pa} //= Perinci::Access->new;
     $self->setting(user     => $opts{user})     if defined $opts{user};
     $self->setting(password => $opts{password}) if defined $opts{password};
@@ -199,6 +210,11 @@ sub known_settings {
                     default=>'text',
                 }],
             },
+            cache_period => {
+                summary => 'Number of seconds to cache Riap results '.
+                    'from server, to speed up things like tab completion',
+                schema => ['int*', default=>300],
+            },
             password => {
                 summary => 'For HTTP authentication to server',
                 schema  => 'str*',
@@ -331,7 +347,6 @@ sub prompt_str {
     );
 }
 
-our $_in_completion;
 sub riap_request {
     my ($self, $action, $uri, $extra0) = @_;
     my $copts = {
@@ -344,7 +359,7 @@ sub riap_request {
     my $extra = { %{ $extra0 // {} } };
     $extra->{uri} = $uri;
 
-    my $show = $_in_completion ?
+    my $show = $self->{_in_completion} ?
         $self->setting("debug_riap") && $self->setting("debug_completion") :
             $self->setting("debug_riap");
 
@@ -352,9 +367,27 @@ sub riap_request {
         say "DEBUG: Riap request: $action => $surl ".
             $self->json_encode($extra);
     }
-    my $res  = $self->{_pa}->request($action, $surl, $extra, $copts);
-    if ($show) {
-        say "DEBUG: Riap response: ".$self->json_encode($res);
+    my $res;
+    my $cache_key = $self->json_encode({action=>$action, %$extra});
+    # we only want to cache some actions
+    if ($action =~ /\A(info|list|meta)\z/ &&
+            ($res = $self->{_cache}->get($cache_key))) {
+        # cache hit
+        if ($show) {
+            say "DEBUG: Riap response (from cache): $action => $surl ".
+                $res;
+        }
+        $res = $self->json_decode($res);
+    } else {
+        # cache miss, get from server
+        $res  = $self->{_pa}->request($action, $surl, $extra, $copts);
+        if ($show) {
+            say "DEBUG: Riap response: ".$self->json_encode($res);
+        }
+        if ($self->setting('cache_period')) {
+            $self->{_cache}->set($cache_key, $self->json_encode($res),
+                                 $self->setting('cache_period')." s");
+        }
     }
     $res;
 }
@@ -428,7 +461,7 @@ sub comp_ {
     my $self = shift;
     my ($cmd, $word0, $line, $start) = @_;
 
-    local $_in_completion = 1;
+    local $self->{_in_completion} = 1;
 
     my @res = ("help", "exit");
     push @res, keys %App::riap::Commands::SPEC;
@@ -523,7 +556,7 @@ sub catch_comp {
     my $self = shift;
     my ($cmd, $word, $line, $start) = @_;
 
-    local $_in_completion = 1;
+    local $self->{_in_completion} = 1;
 
     my $pwd = $self->state("pwd");
     my $uri = concat_path_n($pwd, $cmd);
@@ -582,7 +615,7 @@ sub _install_cmds {
 
             my $self = shift;
             my ($word, $line, $start) = @_;
-            local $_in_completion = 1;
+            local $self->{_in_completion} = 1;
             local $ENV{COMP_LINE} = $line;
             local $ENV{COMP_POINT} = $start + length($word);
             my $res = Perinci::Sub::Complete::shell_complete_arg(
@@ -606,7 +639,7 @@ sub _install_cmds {
 }
 
 1;
-# ABSTRACT: Implementation for the riap command-line shell
+# ABSTRACT: Riap command-line client shell
 
 __END__
 
@@ -616,11 +649,11 @@ __END__
 
 =head1 NAME
 
-App::riap - Implementation for the riap command-line shell
+App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -642,7 +675,7 @@ Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Steven Haryanto.
+This software is copyright (c) 2014 by Steven Haryanto.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

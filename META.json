@@ -1,10 +1,10 @@
 {
-   "abstract" : "Implementation for the riap command-line shell",
+   "abstract" : "Riap command-line client shell",
    "author" : [
       "Steven Haryanto <stevenharyanto@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132510",
    "license" : [
       "perl_5"
    ],
@@ -29,6 +29,7 @@
       },
       "runtime" : {
          "requires" : {
+            "CHI" : "0",
             "Color::ANSI::Util" : "0",
             "Data::Clean::JSON" : "0.13",
             "Data::Sah" : "0",
@@ -75,10 +76,10 @@
          "web" : "https://github.com/sharyanto/perl-App-riap"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.018001"
+         "version" : "5.010001"
       },
       "plugins" : [
          {
@@ -279,12 +280,12 @@
          {
             "class" : "Dist::Zilla::Plugin::ReadmeFromPod",
             "name" : "@Author::SHARYANTO/ReadmeFromPod",
-            "version" : "0.21"
+            "version" : "0.18"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::Validate",
             "name" : "@Author::SHARYANTO/Rinci::Validate",
-            "version" : "0.09"
+            "version" : "0.11"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",

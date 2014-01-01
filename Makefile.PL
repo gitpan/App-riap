@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker 6.30;
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Implementation for the riap command-line shell",
+  "ABSTRACT" => "Riap command-line client shell",
   "AUTHOR" => "Steven Haryanto <stevenharyanto\@gmail.com>",
   "BUILD_REQUIRES" => {},
   "CONFIGURE_REQUIRES" => {
@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "App::riap",
   "PREREQ_PM" => {
+    "CHI" => 0,
     "Color::ANSI::Util" => 0,
     "Data::Clean::JSON" => "0.13",
     "Data::Sah" => 0,
@@ -51,7 +52,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,6 +60,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "CHI" => 0,
   "Color::ANSI::Util" => 0,
   "Data::Clean::JSON" => "0.13",
   "Data::Sah" => 0,

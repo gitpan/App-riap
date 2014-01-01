@@ -8,7 +8,7 @@ use Log::Any '$log';
 use Path::Naive qw(is_abs_path normalize_path concat_path_n);
 #use Perinci::Sub::Util qw(err);
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 our %SPEC;
 
@@ -115,16 +115,16 @@ sub ls {
 
         my $res = $shell->riap_request(list => $uri, $extra);
         return $res unless $res->[0] == 200;
-        if (!@{$res->[2]} && defined($leaf) && length($leaf)) {
+        for (@{ $res->[2] }) {
+            my $u = $args{long} ? $_->{uri} : $_;
+            next if defined($leaf) && length($leaf) && $u ne $leaf;
+            push @allres, $_;
+        }
+
+        if (!@allres && defined($leaf) && length($leaf)) {
             return [404, "No such file (Riap entity): $path"];
         }
 
-        for (@{ $res->[2] }) {
-            my $u = $args{long} ? $_->{uri} : $_;
-            next if defined($leaf) && length($leaf) &&
-                $u !~ m!.+/\Q$leaf\E/?\z!;
-            push @allres, $_;
-        }
     }
     [200, "OK", \@allres];
 }
@@ -453,7 +453,7 @@ App::riap::Commands - riap shell commands
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =for Pod::Coverage .+
 
@@ -463,7 +463,7 @@ Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Steven Haryanto.
+This software is copyright (c) 2014 by Steven Haryanto.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
