@@ -3,133 +3,136 @@ abstract: 'Riap command-line client shell'
 author:
   - 'Steven Haryanto <stevenharyanto@gmail.com>'
 build_requires:
-  File::Spec: 0
-  IO::Handle: 0
-  IPC::Open3: 0
-  Test::More: 0
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '6.30'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132510'
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-riap
 requires:
-  CHI: 0
-  Color::ANSI::Util: 0
-  Data::Clean::JSON: 0.13
-  Data::Sah: 0
-  IO::Stty: 0
-  JSON: 0
-  Log::Any: 0
-  Path::Naive: 0.02
-  Perinci::Access: 0.34
-  Perinci::Access::Perl: 0.55
-  Perinci::CmdLine: 0.94
-  Perinci::Result::Format: 0
-  Perinci::Sub::Complete: 0.34
-  Perinci::Sub::GetArgs::Argv: 0.27
-  Perinci::Sub::Util: 0
-  Perinci::Sub::Wrapper: 0.46
+  CHI: '0'
+  Color::ANSI::Util: '0'
+  Data::Clean::JSON: '0.13'
+  Data::Sah: '0'
+  IO::Stty: '0'
+  JSON: '0'
+  Log::Any: '0'
+  Path::Naive: '0.02'
+  Perinci::Access: '0.34'
+  Perinci::Access::Perl: '0.55'
+  Perinci::CmdLine: '0.94'
+  Perinci::Result::Format: '0'
+  Perinci::Sub::Complete: '0.34'
+  Perinci::Sub::GetArgs::Argv: '0.34'
+  Perinci::Sub::Util: '0'
+  Perinci::Sub::Wrapper: '0.51'
   Riap: v1.1.19
-  SHARYANTO::Complete::Util: 0
-  Signal::Safety: 0
-  Term::Detect::Software: 0
-  Term::ReadLine::Perl: 0
-  Term::Shell: 0
-  URI: 0
-  perl: 5.010001
+  SHARYANTO::Complete::Util: '0'
+  Signal::Safety: '0'
+  Term::Detect::Software: '0'
+  Term::ReadLine::Perl: '0'
+  Term::Shell: '0'
+  URI: '0'
+  perl: '5.010001'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-riap
   homepage: https://metacpan.org/release/App-riap
   repository: git://github.com/sharyanto/perl-App-riap.git
-version: 0.03
+version: '0.04'
 x_Dist_Zilla:
   perl:
-    version: 5.010001
+    version: '5.018002'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
       name: '@Author::SHARYANTO/@Filter/GatherDir'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::SHARYANTO/@Filter/PruneCruft'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::SHARYANTO/@Filter/ManifestSkip'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::SHARYANTO/@Filter/MetaYAML'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::SHARYANTO/@Filter/License'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::SHARYANTO/@Filter/PodCoverageTests'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::SHARYANTO/@Filter/PodSyntaxTests'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::SHARYANTO/@Filter/ExtraTests'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::SHARYANTO/@Filter/ExecDir'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::SHARYANTO/@Filter/ShareDir'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
       name: '@Author::SHARYANTO/@Filter/MakeMaker'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::SHARYANTO/@Filter/Manifest'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::SHARYANTO/@Filter/ConfirmRelease'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::SHARYANTO/@Filter/UploadToCPAN'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::Author::SHARYANTO::MetaResources
       name: '@Author::SHARYANTO/Author::SHARYANTO::MetaResources'
-      version: 0.01
+      version: '0.01'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::SHARYANTO/CheckChangeLog'
-      version: 0.01
+      version: '0.01'
     -
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::SHARYANTO/CheckMetaResources'
-      version: 0.001
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::SHARYANTO/MetaJSON'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::SHARYANTO/MetaConfig'
-      version: 5.006
+      version: '5.015'
     -
-      class: Dist::Zilla::Plugin::OurPkgVersion
-      name: '@Author::SHARYANTO/OurPkgVersion'
-      version: 0.005000
+      class: Dist::Zilla::Plugin::SHARYANTO::OurPkgVersion
+      name: '@Author::SHARYANTO/SHARYANTO::OurPkgVersion'
+      version: '0.02'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -141,77 +144,81 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Default/SingleEncoding'
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Section::Name
               name: '@Default/Name'
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Section::Version
               name: '@Default/Version'
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/prelude'
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Default/Leftovers'
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/postlude'
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Section::Authors
               name: '@Default/Authors'
-              version: 4.004
+              version: '4.006'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Default/Legal'
-              version: 4.004
+              version: '4.006'
       name: '@Author::SHARYANTO/PodWeaver'
-      version: 4.002
+      version: '4.005'
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: '@Author::SHARYANTO/PruneFiles'
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::ReadmeFromPod
       name: '@Author::SHARYANTO/ReadmeFromPod'
-      version: 0.18
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::Rinci::Validate
       name: '@Author::SHARYANTO/Rinci::Validate'
-      version: 0.11
+      version: '0.12'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -222,23 +229,11 @@ x_Dist_Zilla:
           script_finder:
             - ':ExecFiles'
       name: '@Author::SHARYANTO/Test::Compile'
-      version: 2.037
+      version: '2.040'
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::SHARYANTO/Test::Rinci'
-      version: 0.01
-    -
-      class: Dist::Zilla::Plugin::InstallRelease
-      name: '@Author::SHARYANTO/InstallRelease'
-      version: 0.008
-    -
-      class: Dist::Zilla::Plugin::Run::BeforeBuild
-      name: '@Author::SHARYANTO/Run::BeforeBuild'
-      version: 0.020
-    -
-      class: Dist::Zilla::Plugin::Run::Release
-      name: '@Author::SHARYANTO/Run::Release'
-      version: 0.020
+      version: '0.01'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -246,7 +241,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -254,33 +249,41 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: 5.006
+      version: '5.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: 5.006
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.015'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.015'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: 0
-    version: 5.006
+      is_trial: '0'
+    version: '5.015'

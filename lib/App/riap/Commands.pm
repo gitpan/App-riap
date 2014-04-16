@@ -8,7 +8,7 @@ use Log::Any '$log';
 use Path::Naive qw(is_abs_path normalize_path concat_path_n);
 #use Perinci::Sub::Util qw(err);
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 our %SPEC;
 
@@ -453,7 +453,7 @@ App::riap::Commands - riap shell commands
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =for Pod::Coverage .+
 

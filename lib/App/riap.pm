@@ -15,7 +15,7 @@ use Path::Naive qw(concat_path_n);
 use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
@@ -35,10 +35,12 @@ sub new {
             print <<'EOT';
 Usage:
   riap --help
+  riap --version, -v
   riap [opts] [server-uri]
 
 Options:
   --help            Show this help message
+  --version, -v     Show version and exit
   --user=S, -u      Supply HTTP authentication user
   --password=S, -p  Supply HTTP authentication password
 
@@ -49,6 +51,10 @@ Examples:
 For more help, see the manpage.
 EOT
                 exit 0;
+        },
+        "version|v"    => sub {
+            say "riap version " . ($App::riap::VERSION // "dev");
+            exit 0;
         },
         "user|u=s"     => \$opts{user},
         "password|p=s" => \$opts{password},
@@ -424,6 +430,7 @@ sub _run_cmd {
     my $opt_verbose;
 
     my $res;
+  RUN:
     {
         $res = Perinci::Sub::GetArgs::Argv::get_args_from_argv(
             argv => $args{argv},
@@ -435,7 +442,12 @@ sub _run_cmd {
                 'verbose|v' => \$opt_verbose,
             ],
         );
-        last unless $res->[0] == 200;
+        if ($res->[0] == 502) {
+            # try sending argv to the server because we can't seem to parse it
+            $res = $args{code_argv}->(@{ $args{argv} });
+            last RUN;
+        }
+        last RUN if $res->[0] != 200;
 
         if ($opt_help) {
             $self->_help_cmd(name=>$cmd, meta=>$args{meta});
@@ -534,6 +546,9 @@ sub catch_run {
             my %args = @_;
             delete $args{-shell};
             $self->riap_request(call => $uri, {args=>\%args});
+        },
+        code_argv=>sub {
+            $self->riap_request(call => $uri, {argv=>\@_});
         },
     );
 }
@@ -653,7 +668,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
