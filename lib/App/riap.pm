@@ -15,7 +15,7 @@ use Path::Naive qw(concat_path_n);
 use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
@@ -428,6 +428,7 @@ sub _run_cmd {
 
     my $opt_help;
     my $opt_verbose;
+    my $opt_version;
 
     my $res;
   RUN:
@@ -439,7 +440,8 @@ sub _run_cmd {
             per_arg_json => 1,
             extra_getopts_before => [
                 'help|h|?'  => \$opt_help,
-                'verbose|v' => \$opt_verbose,
+                'verbose'   => \$opt_verbose,
+                'version|v' => \$opt_version,
             ],
         );
         if ($res->[0] == 502) {
@@ -452,6 +454,12 @@ sub _run_cmd {
         if ($opt_help) {
             $self->_help_cmd(name=>$cmd, meta=>$args{meta});
             $res = [200, "OK"];
+            last;
+        }
+
+        if ($opt_version) {
+            $res = [200, "OK", "$cmd version " .
+                        ($args{meta}{entity_v} // '?')];
             last;
         }
 
@@ -635,7 +643,7 @@ sub _install_cmds {
             local $ENV{COMP_POINT} = $start + length($word);
             my $res = Perinci::Sub::Complete::shell_complete_arg(
                 meta => $meta,
-                common_opts => [qw/--help -h -? --verbose -v/],
+                common_opts => [qw/--help -h -? --verbose --version -v/],
                 extra_completer_args => {-shell => $self},
             );
             my @comp = $self->_mimic_shell_completion(@$res);
@@ -668,7 +676,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
