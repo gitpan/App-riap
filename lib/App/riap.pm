@@ -14,8 +14,9 @@ use Data::Clean::JSON;
 use Path::Naive qw(concat_path_n);
 use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
+use Time::HiRes qw(time);
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
@@ -148,7 +149,12 @@ sub cmdloop {
             $line = $o->readline($o->prompt_str);
         }
         last unless defined($line);
+        my $time1 = time();
         $o->cmd($line);
+        my $time2 = time();
+        if ($o->setting('debug_time_command')) {
+            say sprintf("  %.3fs", ($time2-$time1));
+        }
         last if $o->{stop};
     }
     $o->postloop;
@@ -203,6 +209,10 @@ sub known_settings {
         $settings = {
             debug_riap => {
                 summary => 'Whether to display raw Riap requests/responses',
+                schema  => ['bool', default=>0],
+            },
+            debug_time_command => {
+                summary => 'Show how long it takes to complete a command',
                 schema  => ['bool', default=>0],
             },
             debug_completion => {
@@ -595,6 +605,9 @@ sub catch_comp {
     local $ENV{COMP_POINT} = $start + length($word);
     $res = Perinci::Sub::Complete::shell_complete_arg(
         meta => $meta,
+        riap_server_url => $self->state('server_url'),
+        riap_uri        => $uri,
+        riap_client     => $self->{_pa},
         common_opts => [qw/--help -h -? --verbose -v/],
         extra_completer_args => {-shell => $self},
     );
@@ -676,7 +689,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

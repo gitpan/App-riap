@@ -8,7 +8,7 @@ use Log::Any '$log';
 use Path::Naive qw(is_abs_path normalize_path concat_path_n);
 #use Perinci::Sub::Util qw(err);
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 our %SPEC;
 
@@ -87,6 +87,17 @@ $SPEC{ls} = {
             req        => 0,
             pos        => 0,
             completion => $complete_file_or_dir,
+        },
+        all => {
+            summary     => 'Does nothing, added only to let you type ls -la',
+            schema      => ['bool'],
+            description => <<'_',
+
+Some of you might type `ls -la` or `ls -al` by muscle memory. So the -a option
+is added just to allow this to not produce an error :-).
+
+_
+            cmdline_aliases => { a=>{} },
         },
     },
     "x.app.riap.aliases" => ["list"],
@@ -453,7 +464,7 @@ App::riap::Commands - riap shell commands
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =for Pod::Coverage .+
 
