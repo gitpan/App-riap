@@ -8,7 +8,18 @@ use Log::Any '$log';
 use Path::Naive qw(is_abs_path normalize_path concat_path_n);
 #use Perinci::Sub::Util qw(err);
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
+our $DATE = '2014-06-20'; # DATE
+
+# like Path::Naive's concat_path_n, but adds "/" at the end when it thinks the
+# final path is a directory (package). it also doesn't die if $p2 is empty.
+sub _concat_path_ns {
+    my ($p1, $p2) = @_;
+    return $p1 unless defined($p2) && length($p2);
+    my $res = concat_path_n($p1, $p2);
+    $res .= "/" if $p2 =~ m!\A\.\.?\z|/\z!;
+    $res;
+}
 
 our %SPEC;
 
@@ -23,7 +34,7 @@ my $_complete_dir_or_file = sub {
     $dir //= "";
 
     my $pwd = $shell->state("pwd");
-    my $uri = length($dir) ? concat_path_n($pwd, $dir) : $pwd;
+    my $uri = length($dir) ? Path::Naive::concat_path_n($pwd, $dir) : $pwd;
     $uri .= "/" unless $uri =~ m!/\z!;
     my $extra = {};
     $extra->{type} = 'package' if $which eq 'dir';
@@ -69,6 +80,12 @@ $SPEC{ls} = {
     args => {
         long => {
             summary => 'Long mode (detail=1)',
+            description => <<'_',
+
+This will cause the command to request `child_metas` action to the server
+instead of `list`, to get more details.
+
+_
             schema => ['bool'],
             cmdline_aliases => { l => {} },
         },
@@ -106,10 +123,10 @@ sub ls {
     my %args = @_;
     my $shell = $args{-shell};
 
-    my $extra = {}; $extra->{detail} = 1 if $args{long};
     my $pwd = $shell->state("pwd");
     my $uri;
     my ($dir, $leaf);
+    my $resmeta = {};
 
     my @allres;
     #for my $path (@{ $args{paths} // [undef] }) {
@@ -124,12 +141,48 @@ sub ls {
             }
         }
 
-        my $res = $shell->riap_request(list => $uri, $extra);
-        return $res unless $res->[0] == 200;
-        for (@{ $res->[2] }) {
-            my $u = $args{long} ? $_->{uri} : $_;
-            next if defined($leaf) && length($leaf) && $u ne $leaf;
-            push @allres, $_;
+        my $res;
+        if ($args{long}) {
+            $res = $shell->riap_request(child_metas => $uri);
+            return $res unless $res->[0] == 200;
+            for my $u (sort keys %{ $res->[2] }) {
+                my $m = $res->[2]{$u};
+                next if defined($leaf) && length($leaf) && $u ne $leaf;
+                my $type; # XXX duplicate code somewhere
+                if ($u =~ m!/\z!) {
+                    $type = 'package';
+                } elsif ($u =~ /\A\$/) {
+                    $type = 'variable';
+                } elsif ($u =~ /\A\w+\z/) {
+                    $type = 'function';
+                }
+                push @allres, {
+                    uri         => $u,
+                    type        => $type,
+                    summary     => $m->{summary},
+                    date        => $m->{entity_date},
+                    v           => $m->{entity_v},
+                };
+            }
+            my $ff = [qw/type uri v date summary/];
+            my $rfo = {
+                table_column_orders => [$ff],
+            };
+            $resmeta = {
+                "result_format_options" => {
+                    "text"        => $rfo,
+                    "text-simple" => $rfo,
+                },
+                "table.fields" => $ff,
+            },
+        } else {
+            $res = $shell->riap_request(list => $uri);
+            return $res unless $res->[0] == 200;
+
+            for (@{ $res->[2] }) {
+                next if defined($leaf) && length($leaf) && $_ ne $leaf;
+                push @allres, $_;
+            }
         }
 
         if (!@allres && defined($leaf) && length($leaf)) {
@@ -137,7 +190,7 @@ sub ls {
         }
 
     }
-    [200, "OK", \@allres];
+    [200, "OK", \@allres, $resmeta];
 }
 
 $SPEC{pwd} = {
@@ -364,7 +417,7 @@ sub req {
     my $action = $args{action};
     my $pwd    = $shell->state("pwd");
     my $path   = $args{path};
-    my $uri    = concat_path_n($pwd, $path);
+    my $uri    = _concat_path_ns($pwd, $path);
     my $extra  = $args{extra} // {};
 
     $shell->riap_request($action => $uri, $extra);
@@ -389,7 +442,7 @@ sub meta {
 
     my $pwd  = $shell->state("pwd");
     my $path = $args{path};
-    my $uri  = concat_path_n($pwd, $path);
+    my $uri  = _concat_path_ns($pwd, $path);
 
     $shell->riap_request(meta => $uri);
 }
@@ -413,7 +466,7 @@ sub info {
 
     my $pwd  = $shell->state("pwd");
     my $path = $args{path};
-    my $uri  = concat_path_n($pwd, $path);
+    my $uri  = _concat_path_ns($pwd, $path);
 
     $shell->riap_request(info => $uri);
 }
@@ -442,10 +495,54 @@ sub call {
 
     my $pwd  = $shell->state("pwd");
     my $path = $args{path};
-    my $uri  = concat_path_n($pwd, $path);
+    my $uri  = _concat_path_ns($pwd, $path);
     my $args = $args{args};
 
     $shell->riap_request(call => $uri, {args=>$args});
+}
+
+$SPEC{history} = {
+    v => 1.1,
+    summary => 'shows command-line history',
+    args => {
+        append => {
+            summary    => "Append current session's history to history file",
+            schema     => 'bool',
+            cmdline_aliases => { a=>{} },
+        },
+        read => {
+            summary    => '(Re-)read history from file',
+            schema     => 'bool',
+            cmdline_aliases => { r=>{} },
+        },
+        clear => {
+            summary    => 'Clear history',
+            schema     => 'bool',
+            cmdline_aliases => { c=>{} },
+        },
+    },
+};
+sub history {
+    my %args = @_;
+    my $shell = $args{-shell};
+
+    if ($args{add}) {
+        $shell->save_history;
+        return [200, "OK"];
+    } elsif ($args{read}) {
+        $shell->load_history;
+        return [200, "OK"];
+    } elsif ($args{clear}) {
+        $shell->clear_history;
+        return [200, "OK"];
+    } else {
+        my @history;
+        if ($shell->{term}->Features->{getHistory}) {
+            @history = grep { length } $shell->{term}->GetHistory;
+        }
+        return [200, "OK", \@history,
+                {"x.app.riap.default_format"=>"text-simple"}];
+    }
 }
 
 1;
@@ -464,7 +561,7 @@ App::riap::Commands - riap shell commands
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =for Pod::Coverage .+
 

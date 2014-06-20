@@ -16,7 +16,8 @@ use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
+our $DATE = '2014-06-20'; # DATE
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
@@ -313,6 +314,14 @@ sub save_settings {
     die "Unimplemented";
 }
 
+sub clear_history {
+    my $self = shift;
+
+    if ($self->{term}->Features->{setHistory}) {
+        $self->{term}->SetHistory();
+    }
+}
+
 sub load_history {
     my $self = shift;
 
@@ -426,19 +435,25 @@ sub _help_cmd {
     for (qw/action format format_options version/) {
         delete $pericmd->common_opts->{$_};
     }
+    $pericmd->common_opts->{json} = {
+        getopt  => 'json',
+        summary => 'Format result as JSON', # XXX translate
+        handler => sub {},
+    };
     $pericmd->run_help;
 }
 
 sub _run_cmd {
     require Perinci::Sub::GetArgs::Argv;
     require Perinci::Result::Format;
+    local $Perinci::Result::Format::Enable_Cleansing = 1;
 
     my ($self, %args) = @_;
     my $cmd = $args{name};
 
     my $opt_help;
     my $opt_verbose;
-    my $opt_version;
+    my $opt_fmt;
 
     my $res;
   RUN:
@@ -451,7 +466,7 @@ sub _run_cmd {
             extra_getopts_before => [
                 'help|h|?'  => \$opt_help,
                 'verbose'   => \$opt_verbose,
-                'version|v' => \$opt_version,
+                'json'      => sub { $opt_fmt = 'json-pretty' },
             ],
         );
         if ($res->[0] == 502) {
@@ -467,12 +482,6 @@ sub _run_cmd {
             last;
         }
 
-        if ($opt_version) {
-            $res = [200, "OK", "$cmd version " .
-                        ($args{meta}{entity_v} // '?')];
-            last;
-        }
-
         if ($res->[3] && defined $res->[3]{'func.missing_arg'}) {
             $res = [400, "Missing required arg '".
                         $res->[3]{'func.missing_arg'}."'"];
@@ -481,8 +490,12 @@ sub _run_cmd {
 
         $res = $args{code}->(%{$res->[2]}, -shell => $self);
     }
-    print Perinci::Result::Format::format(
-        $res, $self->setting('output_format'));
+
+    my $fmt = $opt_fmt //
+        $res->[3]{"x.app.riap.default_format"} //
+            $self->setting('output_format');
+
+    print Perinci::Result::Format::format($res, $fmt);
 }
 
 sub comp_ {
@@ -608,7 +621,7 @@ sub catch_comp {
         riap_server_url => $self->state('server_url'),
         riap_uri        => $uri,
         riap_client     => $self->{_pa},
-        common_opts => [qw/--help -h -? --verbose -v/],
+        common_opts => [qw/--help -h -? --verbose -v --json/],
         extra_completer_args => {-shell => $self},
     );
 
@@ -656,7 +669,7 @@ sub _install_cmds {
             local $ENV{COMP_POINT} = $start + length($word);
             my $res = Perinci::Sub::Complete::shell_complete_arg(
                 meta => $meta,
-                common_opts => [qw/--help -h -? --verbose --version -v/],
+                common_opts => [qw/--help -h -? --verbose -v --json/],
                 extra_completer_args => {-shell => $self},
             );
             my @comp = $self->_mimic_shell_completion(@$res);
@@ -689,7 +702,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
