@@ -8,7 +8,7 @@ use Log::Any '$log';
 use Path::Naive qw(is_abs_path normalize_path concat_path_n);
 #use Perinci::Sub::Util qw(err);
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 our $DATE = '2014-06-20'; # DATE
 
 # like Path::Naive's concat_path_n, but adds "/" at the end when it thinks the
@@ -133,12 +133,7 @@ sub ls {
     for my $path ($args{path}) {
         $uri = $pwd . ($pwd =~ m!/\z! ? "" : "/");
         if (defined $path) {
-            ($dir, $leaf) = $path =~ m!(.*/)?(.*)!;
-            $dir //= "";
-            if (length $dir) {
-                $uri = concat_path_n($pwd, $dir);
-                $uri .= ($uri =~ m!/\z! ? "" : "/");
-            }
+            $uri = _concat_path_ns($pwd, $path);
         }
 
         my $res;
@@ -561,7 +556,7 @@ App::riap::Commands - riap shell commands
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =for Pod::Coverage .+
 

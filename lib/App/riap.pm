@@ -16,7 +16,7 @@ use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 our $DATE = '2014-06-20'; # DATE
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
@@ -702,7 +702,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
