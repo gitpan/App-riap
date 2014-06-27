@@ -16,8 +16,8 @@ use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
 
-our $VERSION = '0.09'; # VERSION
-our $DATE = '2014-06-25'; # DATE
+our $VERSION = '0.10'; # VERSION
+our $DATE = '2014-06-27'; # DATE
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
@@ -617,7 +617,9 @@ sub catch_comp {
     );
 
     @{ Complete::Util::mimic_shell_dir_completion(
-        completion=>$res) };
+        completion => Complete::Util::complete_array(
+            array=>$res->{completion}, word=>$word)
+    ) };
 }
 
 my $installed = 0;
@@ -627,8 +629,8 @@ sub _install_cmds {
     return if $installed;
 
     require App::riap::Commands;
-    require Perinci::Sub::Wrapper;
     require Complete::Util;
+    require Perinci::Sub::Wrapper;
     no strict 'refs';
     for my $cmd (sort keys %App::riap::Commands::SPEC) {
         $log->trace("Installing command $cmd ...");
@@ -666,7 +668,9 @@ sub _install_cmds {
                 extra_completer_args => {-shell => $self},
             );
             my $comp = Complete::Util::mimic_shell_dir_completion(
-                completion => $res);
+                completion => Complete::Util::complete_array(
+                    array=>$res->{completion}, word=>$word)
+            );
             if ($self->setting('debug_completion')) {
                 say "DEBUG: Completion: ".join(", ", @$comp);
             }
@@ -696,7 +700,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
