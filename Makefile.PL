@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "CHI" => 0,
     "Color::ANSI::Util" => 0,
-    "Complete::Util" => "0.09",
+    "Complete::Util" => "0.10",
     "Data::Clean::JSON" => "0.13",
     "Data::Sah" => 0,
     "IO::Stty" => 0,
@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "CHI" => 0,
   "Color::ANSI::Util" => 0,
-  "Complete::Util" => "0.09",
+  "Complete::Util" => "0.10",
   "Data::Clean::JSON" => "0.13",
   "Data::Sah" => 0,
   "File::Spec" => 0,
