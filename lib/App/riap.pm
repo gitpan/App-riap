@@ -16,8 +16,8 @@ use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
 
-our $VERSION = '0.11'; # VERSION
-our $DATE = '2014-06-29'; # DATE
+our $VERSION = '0.12'; # VERSION
+our $DATE = '2014-07-02'; # DATE
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
@@ -105,6 +105,7 @@ EOT
 
 # override, readline workarounds
 sub cmdloop {
+    require Carp;
     require IO::Stty;
     require Signal::Safety;
 
@@ -123,7 +124,12 @@ sub cmdloop {
 
     local $SIG{__DIE__} = sub {
         IO::Stty::stty(\*STDIN, 'echo');
-        die @_;
+        $o->setting('debug_stack_trace') ? Carp::confess(@_) : die(@_);
+    };
+
+    local $SIG{__WARN__} = sub {
+        IO::Stty::stty(\*STDIN, 'echo');
+        $o->setting('debug_stack_trace') ? Carp::cluck(@_) : warn(@_);
     };
 
     # some workaround for Term::ReadLine
@@ -218,6 +224,10 @@ sub known_settings {
             },
             debug_completion => {
                 summary => 'Whether to display debugging for tab completion',
+                schema  => ['bool', default=>0],
+            },
+            debug_stack_trace => {
+                summary => 'Whether to print stack trace on die/warning',
                 schema  => ['bool', default=>0],
             },
             output_format => {
@@ -499,6 +509,7 @@ sub _run_cmd {
 }
 
 sub comp_ {
+    require Complete::Bash;
     require Complete::Util;
 
     my $self = shift;
@@ -527,8 +538,8 @@ sub comp_ {
     }
     #use Data::Dump; dd \@res;
 
-    my $comp = Complete::Util::mimic_shell_dir_completion(
-        Complete::Util::complete_array(
+    my $comp = Complete::Bash::mimic_dir_completion(
+        Complete::Util::complete_array_elem(
             array=>\@res, word=>$word0),
     );
     if ($self->setting("debug_completion")) {
@@ -615,8 +626,8 @@ sub catch_comp {
         extra_completer_args => {-shell => $self},
     );
 
-    @{ Complete::Util::mimic_shell_dir_completion(
-        Complete::Util::complete_array(
+    @{ Complete::Bash::mimic_dir_completion(
+        Complete::Util::complete_array_elem(
             array=>$res->{completion}, word=>$word)
       )};
 }
@@ -666,8 +677,8 @@ sub _install_cmds {
                 common_opts => [qw/--help -h -? --verbose -v --json/],
                 extra_completer_args => {-shell => $self},
             );
-            my $comp = Complete::Util::mimic_shell_dir_completion(
-                Complete::Util::complete_array(
+            my $comp = Complete::Bash::mimic_dir_completion(
+                Complete::Util::complete_array_elem(
                     array=>$res->{completion}, word=>$word)
               );
             if ($self->setting('debug_completion')) {
@@ -699,7 +710,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

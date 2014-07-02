@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.30'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,8 @@ name: App-riap
 requires:
   CHI: '0'
   Color::ANSI::Util: '0'
-  Complete::Util: '0.10'
+  Complete::Bash: '0'
+  Complete::Util: '0.12'
   Data::Clean::JSON: '0.13'
   Data::Sah: '0'
   IO::Stty: '0'
@@ -30,11 +31,12 @@ requires:
   Perinci::Access::Perl: '0.55'
   Perinci::CmdLine: '0.94'
   Perinci::Result::Format: '0'
-  Perinci::Sub::Complete: '0.48'
+  Perinci::Sub::Complete: '0.52'
   Perinci::Sub::GetArgs::Argv: '0.34'
   Perinci::Sub::Util: '0'
   Perinci::Sub::Wrapper: '0.51'
   Riap: v1.1.19
+  Rinci: v1.1.0
   Signal::Safety: '0'
   Term::Detect::Software: '0'
   Term::ReadLine::Perl: '0'
@@ -45,7 +47,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-riap
   homepage: https://metacpan.org/release/App-riap
   repository: git://github.com/sharyanto/perl-App-riap.git
-version: '0.11'
+version: '0.12'
 x_Dist_Zilla:
   perl:
     version: '5.018002'
@@ -233,7 +235,7 @@ x_Dist_Zilla:
           script_finder:
             - ':ExecFiles'
       name: '@Author::SHARYANTO/Test::Compile'
-      version: '2.043'
+      version: '2.040'
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::SHARYANTO/Test::Rinci'
