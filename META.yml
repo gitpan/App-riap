@@ -19,7 +19,7 @@ name: App-riap
 requires:
   CHI: '0'
   Color::ANSI::Util: '0'
-  Complete::Bash: '0'
+  Complete::Bash: '0.04'
   Complete::Util: '0.12'
   Data::Clean::JSON: '0.13'
   Data::Sah: '0'
@@ -31,8 +31,8 @@ requires:
   Perinci::Access::Perl: '0.55'
   Perinci::CmdLine: '0.94'
   Perinci::Result::Format: '0'
-  Perinci::Sub::Complete: '0.53'
-  Perinci::Sub::GetArgs::Argv: '0.34'
+  Perinci::Sub::Complete: '0.55'
+  Perinci::Sub::GetArgs::Argv: '0.44'
   Perinci::Sub::Util: '0'
   Perinci::Sub::Wrapper: '0.51'
   Riap: v1.1.19
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-riap
   homepage: https://metacpan.org/release/App-riap
   repository: git://github.com/sharyanto/perl-App-riap.git
-version: '0.13'
+version: '0.14'
 x_Dist_Zilla:
   perl:
     version: '5.018002'

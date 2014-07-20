@@ -1,10 +1,10 @@
-#!/usr/bin/perl
+#!perl
 
 use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 use App::riap;
 
@@ -28,7 +28,7 @@ riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

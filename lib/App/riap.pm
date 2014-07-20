@@ -16,8 +16,8 @@ use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
 
-our $VERSION = '0.13'; # VERSION
-our $DATE = '2014-07-02'; # DATE
+our $VERSION = '0.14'; # VERSION
+our $DATE = '2014-07-18'; # DATE
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
@@ -473,11 +473,11 @@ sub _run_cmd {
             meta => $args{meta},
             check_required_args => 0,
             per_arg_json => 1,
-            extra_getopts_before => [
-                'help|h|?'  => \$opt_help,
-                'verbose'   => \$opt_verbose,
+            common_opts => {
+                'help|h|?'  => sub { $opt_help = 1 },
+                'verbose'   => sub { $opt_verbose = 1 },
                 'json'      => sub { $opt_fmt = 'json-pretty' },
-            ],
+            },
         );
         if ($res->[0] == 502) {
             # try sending argv to the server because we can't seem to parse it
@@ -622,7 +622,7 @@ sub catch_comp {
         riap_server_url => $self->state('server_url'),
         riap_uri        => $uri,
         riap_client     => $self->{_pa},
-        common_opts     => [qw/--help -h -? --verbose -v --json/],
+        common_opts     => {'help|h|?'=>sub{}, 'verbose|v'=>sub{},'json'=>sub{}},
         extra_completer_args => {-shell => $self},
     );
 
@@ -674,7 +674,7 @@ sub _install_cmds {
             local $ENV{COMP_POINT} = $start + length($word);
             my $res = Perinci::Sub::Complete::complete_cli_arg(
                 meta => $meta,
-                common_opts => [qw/--help -h -? --verbose -v --json/],
+                common_opts => {'help|h|?'=>sub{}, 'verbose|v'=>sub{},'json'=>sub{}},
                 extra_completer_args => {-shell => $self},
             );
             my $comp = Complete::Bash::mimic_dir_completion(
@@ -710,7 +710,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

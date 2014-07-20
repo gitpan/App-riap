@@ -8,8 +8,8 @@ use Log::Any '$log';
 use Path::Naive qw(is_abs_path normalize_path concat_path_n);
 #use Perinci::Sub::Util qw(err);
 
-our $VERSION = '0.13'; # VERSION
-our $DATE = '2014-07-02'; # DATE
+our $VERSION = '0.14'; # VERSION
+our $DATE = '2014-07-18'; # DATE
 
 # like Path::Naive's concat_path_n, but adds "/" at the end when it thinks the
 # final path is a directory (package). it also doesn't die if $p2 is empty.
@@ -556,7 +556,7 @@ App::riap::Commands - riap shell commands
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =for Pod::Coverage .+
 
