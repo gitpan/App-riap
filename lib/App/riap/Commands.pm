@@ -8,8 +8,8 @@ use Log::Any '$log';
 use Path::Naive qw(is_abs_path normalize_path concat_path_n);
 #use Perinci::Sub::Util qw(err);
 
-our $VERSION = '0.16'; # VERSION
-our $DATE = '2014-07-23'; # DATE
+our $VERSION = '0.17'; # VERSION
+our $DATE = '2014-07-29'; # DATE
 
 # like Path::Naive's concat_path_n, but adds "/" at the end when it thinks the
 # final path is a directory (package). it also doesn't die if $p2 is empty.
@@ -27,7 +27,7 @@ my $_complete_dir_or_file = sub {
     my $which = shift;
 
     my %args = @_;
-    my $shell = $args{parent_args}{parent_args}{extra_completer_args}{-shell};
+    my $shell = $args{extras}{-shell};
 
     my $word0 = $args{word};
     my ($dir, $word) = $word0 =~ m!(.*/)?(.*)!;
@@ -64,7 +64,7 @@ my $complete_executable = sub {
 
 my $complete_setting_name = sub {
     my %args = @_;
-    my $shell = $args{parent_args}{parent_args}{extra_completer_args}{-shell};
+    my $shell = $args{extras}{-shell};
 
     [keys %{ $shell->known_settings }];
 };
@@ -274,8 +274,7 @@ $SPEC{set} = {
                 require Perinci::Sub::Complete;
 
                 my %args = @_;
-                my $shell = $args{parent_args}{parent_args}->
-                    {extra_completer_args}{-shell};
+                my $shell = $args{extras}{-shell};
 
                 my $args = $args{args};
                 return [] unless $args->{name};
@@ -556,7 +555,7 @@ App::riap::Commands - riap shell commands
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =for Pod::Coverage .+
 
