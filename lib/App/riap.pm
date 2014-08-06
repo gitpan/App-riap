@@ -16,7 +16,7 @@ use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
 
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 our $DATE = '2014-08-06'; # DATE
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
@@ -631,6 +631,7 @@ sub catch_comp {
 
     my ($words, $cword) = @{ Complete::Bash::parse_cmdline(
         $line, $start+length($word), '=') };
+    shift @$words; $cword--; # strip program name
     $opts = {};
     $res = Perinci::Sub::Complete::complete_cli_arg(
         words => $words, cword => $cword,
@@ -695,6 +696,7 @@ sub _install_cmds {
             local $self->{_in_completion} = 1;
             my ($words, $cword) = @{ Complete::Bash::parse_cmdline(
                 $line, $start+length($word), '=') };
+            shift @$words; $cword--; # strip program name
             $opts = {};
             my $res = Perinci::Sub::Complete::complete_cli_arg(
                 words => $words, cword => $cword,
@@ -738,7 +740,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
