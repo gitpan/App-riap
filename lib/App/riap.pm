@@ -16,8 +16,8 @@ use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
 
-our $VERSION = '0.17'; # VERSION
-our $DATE = '2014-07-29'; # DATE
+our $VERSION = '0.18'; # VERSION
+our $DATE = '2014-08-06'; # DATE
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
@@ -93,7 +93,7 @@ EOT
     my $pwd;
     my $surl = URI->new($ARGV[0] // "/");
     $self->state(server_url => $surl);
-    my $res = $self->{_pa}->parse_url($surl);
+    my $res = $self->riap_parse_url($surl);
     die "Can't parse url $surl\n" unless $res;
     $pwd = $res->{path};
     $self->state(pwd        => $pwd);
@@ -382,12 +382,23 @@ sub prompt_str {
     );
 }
 
-sub riap_request {
-    my ($self, $action, $uri, $extra0) = @_;
-    my $copts = {
+sub _riap_set_copts {
+    my $self = shift;
+    return {
         user     => $self->setting('user'),
         password => $self->setting('password'),
     };
+}
+
+sub riap_parse_url {
+    my ($self, $url) = @_;
+    my $copts = $self->_riap_set_copts;
+    $self->{_pa}->parse_url($url, $copts);
+}
+
+sub riap_request {
+    my ($self, $action, $uri, $extra0) = @_;
+    my $copts = $self->_riap_set_copts;
 
     my $surl = $self->state('server_url');
 
@@ -405,7 +416,7 @@ sub riap_request {
     my $res;
     my $cache_key = $self->json_encode({action=>$action, %$extra});
     # we only want to cache some actions
-    if ($action =~ /\A(info|list|meta)\z/ &&
+    if ($action =~ /\A(info|list|meta|child_metas)\z/ &&
             ($res = $self->{_cache}->get($cache_key))) {
         # cache hit
         if ($show) {
@@ -727,7 +738,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
