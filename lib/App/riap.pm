@@ -16,7 +16,7 @@ use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
 
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 our $DATE = '2014-08-06'; # DATE
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
@@ -552,7 +552,7 @@ sub comp_ {
     my $comp = Complete::Bash::format_completion({
         path_sep   => '/',
         as         => 'array',
-        escmode    => 'none',
+        escmode    => 'default',
         completion => Complete::Util::complete_array_elem(
             array=>\@res, word=>$word0),
     });
@@ -612,6 +612,7 @@ sub catch_run {
 
 sub catch_comp {
     require Perinci::Sub::Complete;
+    require Complete::Bash;
     require Complete::Util;
 
     my $self = shift;
@@ -645,7 +646,7 @@ sub catch_comp {
     @{ Complete::Bash::format_completion({
         path_sep   => '/',
         as         => 'array',
-        escmode    => 'none',
+        escmode    => 'default',
         completion => Complete::Util::complete_array_elem(
             array=>$res->{completion}, word=>$word),
     })};
@@ -707,7 +708,7 @@ sub _install_cmds {
             my $comp = Complete::Bash::format_completion({
                 path_sep   => '/',
                 as         => 'array',
-                escmode    => 'none',
+                escmode    => 'default',
                 completion => Complete::Util::complete_array_elem(
                     array=>$res->{completion}, word=>$word),
             });
@@ -740,7 +741,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

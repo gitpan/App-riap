@@ -2,7 +2,7 @@ NAME
     App::riap - Riap command-line client shell
 
 VERSION
-    version 0.19
+    version 0.20
 
 SYNOPSIS
     Use the provided riap script.
