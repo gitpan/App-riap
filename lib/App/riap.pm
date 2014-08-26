@@ -16,8 +16,8 @@ use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
 
-our $VERSION = '0.20'; # VERSION
-our $DATE = '2014-08-06'; # DATE
+our $VERSION = '0.21'; # VERSION
+our $DATE = '2014-08-24'; # DATE
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
@@ -461,7 +461,8 @@ sub _help_cmd {
         summary => 'Format result as JSON', # XXX translate
         handler => sub {},
     };
-    $pericmd->run_help;
+    my $res = $pericmd->run_help;
+    print $res->[2];
 }
 
 my $opts = {};
@@ -741,7 +742,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 
