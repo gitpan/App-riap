@@ -16,8 +16,8 @@ use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
 
-our $VERSION = '0.21'; # VERSION
-our $DATE = '2014-08-24'; # DATE
+our $VERSION = '0.22'; # VERSION
+our $DATE = '2014-09-04'; # DATE
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
@@ -450,9 +450,6 @@ sub _help_cmd {
         log_any_app => 0,
         program_name => $args{name},
     );
-    # hacks to avoid specifying url
-    $pericmd->{_help_meta} = $args{meta};
-    $pericmd->{_help_info} = {type=>'function'};
     for (qw/action format format_options version/) {
         delete $pericmd->common_opts->{$_};
     }
@@ -461,7 +458,11 @@ sub _help_cmd {
         summary => 'Format result as JSON', # XXX translate
         handler => sub {},
     };
-    my $res = $pericmd->run_help;
+    my $r = {orig_argv=>[]};
+    # hacks to avoid specifying url
+    $r->{_help_meta} = $args{meta};
+    $r->{_help_info} = {type=>'function'};
+    my $res = $pericmd->run_help($r);
     print $res->[2];
 }
 
@@ -742,7 +743,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -760,11 +761,11 @@ L<Perinci::Access>
 
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Steven Haryanto.
+This software is copyright (c) 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,7 +2,7 @@ NAME
     App::riap - Riap command-line client shell
 
 VERSION
-    version 0.21
+    version 0.22
 
 SYNOPSIS
     Use the provided riap script.
@@ -14,10 +14,10 @@ SEE ALSO
     Perinci::Access
 
 AUTHOR
-    Steven Haryanto <stevenharyanto@gmail.com>
+    perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by Steven Haryanto.
+    This software is copyright (c) 2014 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
