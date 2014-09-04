@@ -16,7 +16,7 @@ use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 our $DATE = '2014-09-04'; # DATE
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
@@ -448,6 +448,7 @@ sub _help_cmd {
     my $pericmd = Perinci::CmdLine->new(
         url => undef,
         log_any_app => 0,
+        read_config => 0,
         program_name => $args{name},
     );
     for (qw/action format format_options version/) {
@@ -743,7 +744,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 
