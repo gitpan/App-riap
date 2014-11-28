@@ -4,7 +4,7 @@
       "perlancar <perlancar@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170",
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
          "requires" : {
             "CHI" : "0",
             "Color::ANSI::Util" : "0",
-            "Complete::Bash" : "0.09",
+            "Complete::Bash" : "0.12",
             "Complete::Util" : "0.12",
             "Data::Clean::JSON" : "0.13",
             "Data::Sah" : "0",
@@ -44,7 +44,7 @@
             "Perinci::Access::Perl" : "0.55",
             "Perinci::CmdLine" : "1.27",
             "Perinci::Result::Format" : "0",
-            "Perinci::Sub::Complete" : "0.61",
+            "Perinci::Sub::Complete" : "0.64",
             "Perinci::Sub::GetArgs::Argv" : "0.46",
             "Perinci::Sub::Util" : "0",
             "Perinci::Sub::Wrapper" : "0.51",
@@ -75,11 +75,11 @@
       "homepage" : "https://metacpan.org/release/App-riap",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/perlancar/perl-App-riap.git",
-         "web" : "https://github.com/perlancar/perl-App-riap"
+         "url" : "git://github.com/sharyanto/perl-App-riap.git",
+         "web" : "https://github.com/sharyanto/perl-App-riap"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.018002"
@@ -184,6 +184,11 @@
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::PERLANCAR/MetaConfig",
             "version" : "5.019"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Rinci::InstallCompletion",
+            "name" : "@Author::PERLANCAR/Rinci::InstallCompletion",
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurDate",
@@ -298,7 +303,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::Validate",
             "name" : "@Author::PERLANCAR/Rinci::Validate",
-            "version" : "0.14"
+            "version" : "0.19"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",
@@ -324,7 +329,7 @@
                }
             },
             "name" : "@Author::PERLANCAR/Test::Compile",
-            "version" : "2.040"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Rinci",

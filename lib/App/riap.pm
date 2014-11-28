@@ -16,8 +16,8 @@ use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
 
-our $VERSION = '0.23'; # VERSION
-our $DATE = '2014-09-04'; # DATE
+our $VERSION = '0.24'; # VERSION
+our $DATE = '2014-11-28'; # DATE
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
@@ -493,7 +493,7 @@ sub _run_cmd {
             per_arg_json => 1,
             common_opts => $common_opts,
         );
-        if ($res->[0] == 502) {
+        if ($res->[0] == 501) {
             # try sending argv to the server because we can't seem to parse it
             $res = $args{code_argv}->(@{ $args{argv} });
             last RUN;
@@ -553,10 +553,10 @@ sub comp_ {
     #use Data::Dump; dd \@res;
 
     my $comp = Complete::Bash::format_completion({
-        path_sep   => '/',
-        as         => 'array',
-        escmode    => 'default',
-        completion => Complete::Util::complete_array_elem(
+        path_sep => '/',
+        as       => 'array',
+        escmode  => 'default',
+        words    => Complete::Util::complete_array_elem(
             array=>\@res, word=>$word0),
     });
     if ($self->setting("debug_completion")) {
@@ -647,16 +647,16 @@ sub catch_comp {
     );
     $res = _hashify_compres($res);
     @{ Complete::Bash::format_completion({
-        path_sep   => '/',
-        as         => 'array',
-        escmode    => 'default',
-        completion => Complete::Util::complete_array_elem(
-            array=>$res->{completion}, word=>$word),
+        path_sep => '/',
+        as       => 'array',
+        escmode  => 'default',
+        words    => Complete::Util::complete_array_elem(
+            array=>$res->{words}, word=>$word),
     })};
 }
 
 sub _hashify_compres {
-    ref($_[0]) eq 'HASH' ? $_[0] : {completion=>$_[0]};
+    ref($_[0]) eq 'HASH' ? $_[0] : {words=>$_[0]};
 }
 
 my $installed = 0;
@@ -709,11 +709,11 @@ sub _install_cmds {
             );
             $res = _hashify_compres($res);
             my $comp = Complete::Bash::format_completion({
-                path_sep   => '/',
-                as         => 'array',
-                escmode    => 'default',
-                completion => Complete::Util::complete_array_elem(
-                    array=>$res->{completion}, word=>$word),
+                path_sep => '/',
+                as       => 'array',
+                escmode  => 'default',
+                words    => Complete::Util::complete_array_elem(
+                    array=>$res->{words}, word=>$word),
             });
             if ($self->setting('debug_completion')) {
                 say "DEBUG: Completion: ".join(", ", @$comp);
@@ -744,7 +744,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 
