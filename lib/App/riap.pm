@@ -1,5 +1,8 @@
 package App::riap;
 
+our $DATE = '2014-12-20'; # DATE
+our $VERSION = '0.25'; # VERSION
+
 use 5.010001;
 use strict;
 use utf8;
@@ -15,9 +18,6 @@ use Path::Naive qw(concat_path_n);
 use Perinci::Sub::Util qw(err);
 use Term::Detect::Software qw(detect_terminal_cached);
 use Time::HiRes qw(time);
-
-our $VERSION = '0.24'; # VERSION
-our $DATE = '2014-11-28'; # DATE
 
 my $cleanser = Data::Clean::JSON->get_cleanser;
 
@@ -744,7 +744,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 

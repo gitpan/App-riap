@@ -1,5 +1,8 @@
 package App::riap::Commands;
 
+our $DATE = '2014-12-20'; # DATE
+our $VERSION = '0.25'; # VERSION
+
 use 5.010;
 use strict;
 use warnings;
@@ -7,9 +10,6 @@ use Log::Any '$log';
 
 use Path::Naive qw(is_abs_path normalize_path concat_path_n);
 #use Perinci::Sub::Util qw(err);
-
-our $VERSION = '0.24'; # VERSION
-our $DATE = '2014-11-28'; # DATE
 
 # like Path::Naive's concat_path_n, but adds "/" at the end when it thinks the
 # final path is a directory (package). it also doesn't die if $p2 is empty.
@@ -23,11 +23,16 @@ sub _concat_path_ns {
 
 our %SPEC;
 
+$SPEC{':package'} = {
+    v => 1.1,
+    summary => 'riap shell commands',
+};
+
 my $_complete_dir_or_file = sub {
     my $which = shift;
 
     my %args = @_;
-    my $shell = $args{extras}{-shell};
+    my $shell = $args{-shell};
 
     my $word0 = $args{word};
     my ($dir, $word) = $word0 =~ m!(.*/)?(.*)!;
@@ -64,7 +69,7 @@ my $complete_executable = sub {
 
 my $complete_setting_name = sub {
     my %args = @_;
-    my $shell = $args{extras}{-shell};
+    my $shell = $args{-shell};
 
     [keys %{ $shell->known_settings }];
 };
@@ -274,8 +279,8 @@ $SPEC{set} = {
                 require Perinci::Sub::Complete;
 
                 my %args = @_;
-                my $shell = $args{extras}{-shell};
-                my $args  = $args{extras}{args};
+                my $shell = $args{-shell};
+                my $args  = $args{args};
                 return [] unless $args->{name};
                 my $setting = $shell->known_settings->{ $args->{name} };
                 return [] unless $setting;
@@ -539,7 +544,6 @@ sub history {
 }
 
 1;
-
 # ABSTRACT: riap shell commands
 
 __END__
@@ -554,7 +558,7 @@ App::riap::Commands - riap shell commands
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =for Pod::Coverage .+
 
