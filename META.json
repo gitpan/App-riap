@@ -80,7 +80,7 @@
          "web" : "https://github.com/sharyanto/perl-App-riap"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.018001"

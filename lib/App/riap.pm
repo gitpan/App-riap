@@ -1,7 +1,7 @@
 package App::riap;
 
-our $DATE = '2014-12-20'; # DATE
-our $VERSION = '0.25'; # VERSION
+our $DATE = '2014-12-22'; # DATE
+our $VERSION = '0.26'; # VERSION
 
 use 5.010001;
 use strict;
@@ -532,7 +532,7 @@ sub comp_ {
     local $self->{_in_completion} = 1;
 
     my @res = ("help", "exit");
-    push @res, keys %App::riap::Commands::SPEC;
+    push @res, grep {/\A\w+\z/} keys %App::riap::Commands::SPEC;
 
     # add functions
     my ($dir, $word) = $word0 =~ m!(.*/)?(.*)!;
@@ -670,6 +670,7 @@ sub _install_cmds {
     require Perinci::Sub::Wrapper;
     no strict 'refs';
     for my $cmd (sort keys %App::riap::Commands::SPEC) {
+        next unless $cmd =~ /\A\w+\z/; # only functions
         $log->trace("Installing command $cmd ...");
         my $meta = $App::riap::Commands::SPEC{$cmd};
         my $code = \&{"App::riap::Commands::$cmd"};
@@ -744,7 +745,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.25
+version 0.26
 
 =head1 SYNOPSIS
 
