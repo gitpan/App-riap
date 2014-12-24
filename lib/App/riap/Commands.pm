@@ -1,7 +1,7 @@
 package App::riap::Commands;
 
-our $DATE = '2014-12-22'; # DATE
-our $VERSION = '0.26'; # VERSION
+our $DATE = '2014-12-23'; # DATE
+our $VERSION = '0.27'; # VERSION
 
 use 5.010;
 use strict;
@@ -558,7 +558,7 @@ App::riap::Commands - riap shell commands
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =for Pod::Coverage .+
 
