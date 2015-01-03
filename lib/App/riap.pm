@@ -1,7 +1,7 @@
 package App::riap;
 
-our $DATE = '2014-12-23'; # DATE
-our $VERSION = '0.27'; # VERSION
+our $DATE = '2015-01-03'; # DATE
+our $VERSION = '0.28'; # VERSION
 
 use 5.010001;
 use strict;
@@ -740,7 +740,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -762,7 +762,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by perlancar@cpan.org.
+This software is copyright (c) 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

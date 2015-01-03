@@ -49,10 +49,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-riap
   homepage: https://metacpan.org/release/App-riap
   repository: git://github.com/sharyanto/perl-App-riap.git
-version: '0.27'
+version: '0.28'
 x_Dist_Zilla:
   perl:
-    version: '5.018001'
+    version: '5.018002'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -272,6 +272,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
+      version: '0.01'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::GenTodoMd
+      name: '@Author::PERLANCAR/PERLANCAR::GenTodoMd'
       version: '0.01'
     -
       class: Dist::Zilla::Plugin::Prereqs

@@ -4,7 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.27'; # VERSION
+our $VERSION = '0.28'; # VERSION
 
 use App::riap;
 
@@ -28,7 +28,7 @@ riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -337,27 +337,13 @@ Settings file. Each line is either a blank line, a comment (C<# ...>), or C<<
 <name>=<value-in-json> >>. An invalid line (e.g. unknown settings, invalid JSON
 syntax) will cause shell to abort when loading.
 
-=head1 TODO
-
-=over
-
-=item * Configurable prompt
-
-=item * RIAP_HISTSIZE
-
-And also probably RIAP_HISTFILESIZE, RIAP_HISTIGNORE, RIAP_HISTTIMEFORMAT.
-
-=item * Something like PATH? [#E]
-
-=back
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by perlancar@cpan.org.
+This software is copyright (c) 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

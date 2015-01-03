@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+TODO.md
 bin/riap
 dist.ini
 lib/App/riap.pm
